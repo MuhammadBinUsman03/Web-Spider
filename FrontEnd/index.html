@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Web Crawler</title>
+</head>
+<body>
+    <h1>Web Crawler</h1>
+    <form action="index.php" method="post">
+        <label for="seedURL">Seed URL:</label>
+        <input type="text" id="seedURL" name="seedURL"><br><br>
+
+        <label for="depthLimit">Depth Limit:</label>
+        <input type="number" id="depthLimit" name="depthLimit"><br><br>
+
+        <label for="searchString">Search String:</label>
+        <input type="text" id="searchString" name="searchString"><br><br>
+
+        <input type="submit" value="Crawl" name="crawl">
+        <input type="submit" value="Search" name="search">
+    </form>
+
+    <div>
+        <!-- Display extracted information and search results here -->
+    </div>
+</body>
+</html>
