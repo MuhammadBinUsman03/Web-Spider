@@ -1,5 +1,6 @@
 <?php
-
+// Require the file containing the crawl function
+require_once('../Crawling/crawler.php');
 
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -7,12 +8,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['crawl'])) {
         // Collecting form data
         $seedURL = $_POST['seedURL'];
-        $depthLimit = $_POST['depthLimit'];
+        $depthLimit = intval($_POST['depthLimit']);
 
         // Check if the seed URL and depth limit are not empty
         if (!empty($seedURL) && !empty($depthLimit)) {
             // Call crawl function with the collected data
-
+            // echo $seedURL, $depthLimit;
+            crawl_page($seedURL, $depthLimit);
         } else {
             echo "Please provide both Seed URL and Depth Limit.";
         }
