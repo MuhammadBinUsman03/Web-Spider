@@ -20,4 +20,22 @@ function InsertHTML($url, $content){
     mysqli_query($conn, $query);
 }
 
+function TruncateTable(){
+    global $conn;
+    $query = "TRUNCATE TABLE crawled_pages";
+    mysqli_query($conn, $query);
+}
+
+function FetchRecords($searchString){
+    global $conn;
+    // Search for links containing the search string and returns the set object containing all results
+    $searchQuery = "SELECT url, html_content FROM crawled_pages WHERE html_content LIKE '%$searchString%'";
+    $result = mysqli_query($conn, $searchQuery);
+    return $result;
+}
+// Close the connection
+function closeConn(){
+    global $conn;
+    mysqli_close($conn);
+}
 ?>
