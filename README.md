@@ -15,6 +15,7 @@ XAMPP or any (PHP+MySQL)- hosting service
 
 # Usage
 - Clone the repository in `htdocs` directory of XAMPP
+- Goto PHPmyAdmin, open an SQL script, and copy paste SQL from `crawlingData.sql`
 - Start `Apache` and `MySQL` on XAMPP
 - Goto `http://localhost/WebSpider/FrontEnd/index.html`
 - Provide SEED URL, Depth for Crawling
