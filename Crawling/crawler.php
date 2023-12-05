@@ -4,7 +4,7 @@ set_time_limit(600);
 function crawl_page($url, $depth = 2) {
     static $URLQueue = array();
 
-    if (isset($URLQueue[$url])) {
+    if (isAllowedByRobotsTxt($url) || isset($URLQueue[$url])) {
         return;
     }
 
@@ -12,15 +12,20 @@ function crawl_page($url, $depth = 2) {
 
     $dom = new DOMDocument();
     @$dom->loadHTMLFile($url);
-    
 
     $htmlContent = $dom->saveHTML();
-    InsertHTML($url, $htmlContent);  
+    $metaInfo = extractMetaInfo($htmlContent);
+    $title = $metaInfo['title'];
+    $metaDesc = $metaInfo['meta_description'];
+    echo "Title: " . $metaInfo['title'] . "<br>";
+    echo "Meta Description: " . $metaInfo['meta_description'] . "<br><br><hr>";
+    InsertHTML($url, $title, $htmlContent, $metaDesc);  
     
     // If depth has reached end, return because last layer has been inserted into database
     if ($depth === 0){
         return;
     }
+    //Extract anchor tags from the HTML document
     $anchors = $dom->getElementsByTagName('a');
     foreach ($anchors as $element) {
         $href = $element->getAttribute('href');
@@ -30,7 +35,7 @@ function crawl_page($url, $depth = 2) {
         $href = resolve_url($url, $href);
 
         //Output URL and crawl deeper
-        echo "<a href='".$href."'>".$a_text."</a><br>";
+        echo "URL: <a href='".$href."'>".$a_text."</a><br>";
         crawl_page($href, $depth - 1);
     }
 }
@@ -47,5 +52,54 @@ function resolve_url($base, $href) {
     } else {
         return $base . $href;
     }
+}
+
+// Get Title and Meta Description
+function extractMetaInfo($htmlContent) {
+    $dom = new DOMDocument();
+    @$dom->loadHTML($htmlContent);
+
+    @$title = $dom->getElementsByTagName('title')->item(0)->textContent;
+
+    $metaDescription = '';
+    $metaTags = $dom->getElementsByTagName('meta');
+    foreach ($metaTags as $tag) {
+        if ($tag->getAttribute('name') === 'description') {
+            $metaDescription = $tag->getAttribute('content');
+            break;
+        }
+    }
+
+    return [
+        'title' => $title,
+        'meta_description' => $metaDescription
+    ];
+}
+
+//Check Robots.txt
+function isAllowedByRobotsTxt($url)
+{
+    $robotsUrl = parse_url($url);
+    $robotsUrl['path'] = '/robots.txt';
+    $robotsTxtUrl = $robotsUrl['scheme'] . '://' . $robotsUrl['host'] . (isset($robotsUrl['port']) ? ':' . $robotsUrl['port'] : '') . $robotsUrl['path'];
+    $robotsContent = @file_get_contents($robotsTxtUrl);
+
+    if ($robotsContent === false) {
+        return true;
+    }
+
+    $robotsRules = explode("\n", $robotsContent);
+    foreach ($robotsRules as $rule) {
+        if (strpos($rule, 'Disallow:') !== false) {
+            $disallowedPath = trim(str_replace('Disallow:', '', $rule));
+            $disallowedUrl = $robotsUrl['scheme'] . '://' . $robotsUrl['host'] . (isset($robotsUrl['port']) ? ':' . $robotsUrl['port'] : '') . $disallowedPath;
+
+            if (strpos($url, $disallowedUrl) === 0) {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 ?>
