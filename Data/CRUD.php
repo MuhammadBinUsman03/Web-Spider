@@ -11,12 +11,12 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-function InsertHTML($url, $content){
+function InsertHTML($url, $title, $content, $description){
     global $conn;
     // Insert URL and HTML content into the database
     //Remove escape characters in HTML content
     $content = mysqli_real_escape_string($conn, $content);
-    $query = "INSERT INTO crawled_pages (url, html_content) VALUES ('$url', '$content')";
+    $query = "INSERT INTO crawled_pages (url, title, html_content, Description) VALUES ('$url', '$title','$content', '$description')";
     mysqli_query($conn, $query);
 }
 
